@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 
-const Register = ({ onRegister }: { onRegister: (username: string, password: string) => void }) => {
-  const [username, setUsername] = useState("");
+const Register = ({ onRegister }: { onRegister: (name: string, email: string, password: string) => void }) => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onRegister(username, password);
+    onRegister(name, email, password);
   };
 
   return (
@@ -16,9 +17,17 @@ const Register = ({ onRegister }: { onRegister: (username: string, password: str
         <input
           className="border p-2 rounded"
           type="text"
-          placeholder="Username"
-          value={username}
-          onChange={e => setUsername(e.target.value)}
+          placeholder="Name"
+          value={name}
+          onChange={e => setName(e.target.value)}
+          required
+        />
+        <input
+          className="border p-2 rounded"
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
           required
         />
         <input

@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 
-const Login = ({ onLogin }: { onLogin: (username: string, password: string) => void }) => {
-  const [username, setUsername] = useState("");
+const Login = ({ onLogin }: { onLogin: (email: string, password: string) => void }) => {
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onLogin(username, password);
+    onLogin(email, password);
   };
 
   return (
@@ -15,10 +15,10 @@ const Login = ({ onLogin }: { onLogin: (username: string, password: string) => v
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <input
           className="border p-2 rounded"
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={e => setUsername(e.target.value)}
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
           required
         />
         <input
