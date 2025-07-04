@@ -4,6 +4,7 @@ import com.example.airlinebooking.model.Booking;
 import com.example.airlinebooking.model.User;
 import com.example.airlinebooking.dto.BookingRequest;
 import com.example.airlinebooking.dto.BookingUpdateRequest;
+import com.example.airlinebooking.dto.BookingStatusUpdateRequest;
 import com.example.airlinebooking.service.BookingService;
 import com.example.airlinebooking.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -58,6 +59,20 @@ public class BookingController {
     public ResponseEntity<Booking> updateBooking(@PathVariable Long id, @Valid @RequestBody BookingUpdateRequest request) {
         User currentUser = getCurrentUser();
         Booking updatedBooking = bookingService.updateBooking(id, currentUser.getId(), request.getFlightId());
+        return ResponseEntity.ok(updatedBooking);
+    }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<Booking> updateBookingStatus(@PathVariable Long id, @RequestBody BookingStatusUpdateRequest request) {
+        User currentUser = getCurrentUser();
+        Booking updatedBooking = bookingService.updateBookingStatus(id, currentUser.getId(), request.getStatus());
+        return ResponseEntity.ok(updatedBooking);
+    }
+
+    // System endpoint for recommendation engine to update booking status
+    @PutMapping("/{id}/status/system")
+    public ResponseEntity<Booking> updateBookingStatusForSystem(@PathVariable Long id, @RequestBody BookingStatusUpdateRequest request) {
+        Booking updatedBooking = bookingService.updateBookingStatusForSystem(id, request.getStatus());
         return ResponseEntity.ok(updatedBooking);
     }
 

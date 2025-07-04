@@ -1,6 +1,13 @@
 import React, { useState } from "react";
+import AuthLayout from "./AuthLayout";
 
-const Register = ({ onRegister }: { onRegister: (name: string, email: string, password: string) => void }) => {
+interface RegisterProps {
+  onRegister: (name: string, email: string, password: string) => void;
+  onBackToHome?: () => void;
+  onGoToLogin?: () => void;
+}
+
+const Register = ({ onRegister, onBackToHome, onGoToLogin }: RegisterProps) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -11,8 +18,7 @@ const Register = ({ onRegister }: { onRegister: (name: string, email: string, pa
   };
 
   return (
-    <div className="max-w-sm mx-auto bg-white p-6 rounded shadow">
-      <h2 className="text-xl mb-4">Register</h2>
+    <AuthLayout title="Sign Up" onBackToHome={onBackToHome}>
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <input
           className="border p-2 rounded"
@@ -42,7 +48,16 @@ const Register = ({ onRegister }: { onRegister: (name: string, email: string, pa
           Register
         </button>
       </form>
-    </div>
+      <div className="mt-4 text-center">
+        <span className="text-sm text-gray-600">Already have an account? </span>
+        <button 
+          onClick={onGoToLogin}
+          className="text-blue-600 hover:underline text-sm"
+        >
+          Sign In
+        </button>
+      </div>
+    </AuthLayout>
   );
 };
 

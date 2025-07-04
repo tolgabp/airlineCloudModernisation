@@ -108,4 +108,37 @@ public class BookingController {
 			throw e; // Let the global exception handler deal with it
 		}
 	}
+	
+	// Proxy PUT /api/bookings/{id}/status to legacy PUT /api/bookings/{id}/status
+	@PutMapping("/bookings/{id}/status")
+	public ResponseEntity<String> updateBookingStatus(@PathVariable String id, @RequestBody @NonNull String statusRequest, @RequestHeader(value = "Authorization", required = false) String authorization) {
+		try {
+			String legacyUrl = legacyBaseUrl + "/api/bookings/" + id + "/status";
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_JSON);
+			if (authorization != null) {
+				headers.set("Authorization", authorization);
+			}
+			HttpEntity<String> entity = new HttpEntity<>(statusRequest, headers);
+			ResponseEntity<String> response = restTemplate.exchange(legacyUrl, HttpMethod.PUT, entity, String.class);
+			return ResponseEntity.ok(response.getBody());
+		} catch (Exception e) {
+			throw e; // Let the global exception handler deal with it
+		}
+	}
+	
+	// Proxy PUT /api/bookings/{id}/status/system to legacy PUT /api/bookings/{id}/status/system
+	@PutMapping("/bookings/{id}/status/system")
+	public ResponseEntity<String> updateBookingStatusForSystem(@PathVariable String id, @RequestBody @NonNull String statusRequest) {
+		try {
+			String legacyUrl = legacyBaseUrl + "/api/bookings/" + id + "/status/system";
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_JSON);
+			HttpEntity<String> entity = new HttpEntity<>(statusRequest, headers);
+			ResponseEntity<String> response = restTemplate.exchange(legacyUrl, HttpMethod.PUT, entity, String.class);
+			return ResponseEntity.ok(response.getBody());
+		} catch (Exception e) {
+			throw e; // Let the global exception handler deal with it
+		}
+	}
 }

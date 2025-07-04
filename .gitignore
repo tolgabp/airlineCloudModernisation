@@ -1,2 +1,10 @@
 .idea/
 airline.txt
+README.md
+# Ignore backend secrets
+airlineBooking/src/main/resources/application.properties
+airlineBooking/src/main/resources/application-prod.properties
+cloudApiLayer/src/main/resources/application.properties
+cloudApiLayer/src/main/resources/application-prod.properties
+recommendationEngine/src/main/resources/application.properties
+recommendationEngine/src/main/resources/application-prod.properties

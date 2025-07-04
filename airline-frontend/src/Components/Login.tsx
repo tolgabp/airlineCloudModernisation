@@ -1,6 +1,13 @@
 import React, { useState } from "react";
+import AuthLayout from "./AuthLayout";
 
-const Login = ({ onLogin }: { onLogin: (email: string, password: string) => void }) => {
+interface LoginProps {
+  onLogin: (email: string, password: string) => void;
+  onBackToHome?: () => void;
+  onGoToRegister?: () => void;
+}
+
+const Login = ({ onLogin, onBackToHome, onGoToRegister }: LoginProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -10,8 +17,7 @@ const Login = ({ onLogin }: { onLogin: (email: string, password: string) => void
   };
 
   return (
-    <div className="max-w-sm mx-auto bg-white p-6 rounded shadow">
-      <h2 className="text-xl mb-4">Login</h2>
+    <AuthLayout title="Sign In" onBackToHome={onBackToHome}>
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <input
           className="border p-2 rounded"
@@ -33,7 +39,16 @@ const Login = ({ onLogin }: { onLogin: (email: string, password: string) => void
           Login
         </button>
       </form>
-    </div>
+      <div className="mt-4 text-center">
+        <span className="text-sm text-gray-600">Don't have an account? </span>
+        <button 
+          onClick={onGoToRegister}
+          className="text-blue-600 hover:underline text-sm"
+        >
+          Sign Up
+        </button>
+      </div>
+    </AuthLayout>
   );
 };
 

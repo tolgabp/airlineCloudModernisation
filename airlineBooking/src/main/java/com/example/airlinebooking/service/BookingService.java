@@ -156,4 +156,30 @@ public class BookingService {
         
         return bookingRepository.save(booking);
     }
+    
+    public Booking updateBookingStatus(Long bookingId, Long userId, BookingStatus newStatus) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new BookingNotFoundException("Booking not found with ID: " + bookingId));
+        
+        // Check if user owns this booking
+        if (!booking.getUser().getId().equals(userId)) {
+            throw new UnauthorizedAccessException("User " + userId + " attempted to update status of booking " + bookingId + " owned by user " + booking.getUser().getId());
+        }
+
+        // Update the booking status
+        booking.setStatus(newStatus);
+        
+        return bookingRepository.save(booking);
+    }
+    
+    // Method for recommendation engine to update booking status without user authentication
+    public Booking updateBookingStatusForSystem(Long bookingId, BookingStatus newStatus) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new BookingNotFoundException("Booking not found with ID: " + bookingId));
+
+        // Update the booking status
+        booking.setStatus(newStatus);
+        
+        return bookingRepository.save(booking);
+    }
 } 
