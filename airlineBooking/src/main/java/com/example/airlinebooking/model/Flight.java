@@ -1,4 +1,4 @@
-package com.example.airlinebooking;
+package com.example.airlinebooking.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Setter
 @Getter
 @Entity
+@Table(name = "flight")
 public class Flight {
     // Getters and setters
     @Id

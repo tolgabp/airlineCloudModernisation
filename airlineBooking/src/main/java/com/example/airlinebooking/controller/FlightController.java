@@ -1,6 +1,7 @@
-package com.example.airlinebooking;
+package com.example.airlinebooking.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.airlinebooking.model.Flight;
+import com.example.airlinebooking.repository.FlightRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -9,8 +10,11 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/flights")
 public class FlightController {
-    @Autowired
-    private FlightRepository flightRepository;
+    private final FlightRepository flightRepository;
+
+    public FlightController(FlightRepository flightRepository) {
+        this.flightRepository = flightRepository;
+    }
 
     @GetMapping
     public List<Flight> getAllFlights() {

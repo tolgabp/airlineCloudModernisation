@@ -1,4 +1,4 @@
-package com.example.airlinebooking;
+package com.example.airlinebooking.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
