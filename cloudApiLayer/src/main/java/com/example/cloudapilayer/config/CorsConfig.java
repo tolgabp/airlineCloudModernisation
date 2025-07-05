@@ -14,9 +14,13 @@ public class CorsConfig {
 			@Override
 			public void addCorsMappings(@NonNull CorsRegistry registry){
 				registry.addMapping("/api/**")
-					.allowedOrigins("http://localhost:3000")//frontend URL
+					.allowedOrigins(
+						"http://localhost:3000", // local development
+						"https://airline-frontend-app-876da0517315.herokuapp.com" // Heroku frontend
+					)
 					.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-					.allowedHeaders("*");
+					.allowedHeaders("*")
+					.allowCredentials(true);
 			}
 		};
 	}
