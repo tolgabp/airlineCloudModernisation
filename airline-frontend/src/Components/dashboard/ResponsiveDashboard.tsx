@@ -8,10 +8,9 @@ import { useAuth } from '../../App';
 import { useDataRefresh } from '../../hooks/useDataRefresh';
 import { usePeriodicRefresh } from '../../hooks/usePeriodicRefresh';
 import { useFlightSearch } from '../../hooks/useFlightSearch';
-import axios from 'axios';
+import apiClient from '../../utils/axiosConfig';
 
-// API Configuration
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8081';
+
 
 const ResponsiveDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'flights' | 'delays' | 'profile'>('flights');
@@ -48,7 +47,7 @@ const ResponsiveDashboard: React.FC = () => {
   // Function to fetch flights
   const fetchFlights = useCallback(async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/flights`);
+      const response = await apiClient.get(`/api/flights`);
       const mappedFlights = response.data.map((f: any) => ({
         id: f.id,
         from: f.origin,
@@ -68,9 +67,7 @@ const ResponsiveDashboard: React.FC = () => {
     if (!token) return;
     
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/bookings/my`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await apiClient.get(`/api/bookings/my`);
       setBookings(response.data);
     } catch (error) {
       console.error('Failed to fetch bookings:', error);
@@ -116,10 +113,9 @@ const ResponsiveDashboard: React.FC = () => {
 
     try {
       setBookingMessage('Booking flight...');
-      await axios.post(
-        `${API_BASE_URL}/api/bookings`,
-        { flightId: selectedFlight.id },
-        { headers: { Authorization: `Bearer ${token}` } }
+      await apiClient.post(
+        `/api/bookings`,
+        { flightId: selectedFlight.id }
       );
       
       setBookingMessage('Flight booked successfully!');

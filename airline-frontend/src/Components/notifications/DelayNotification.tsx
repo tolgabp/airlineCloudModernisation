@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import apiClient from '../../utils/axiosConfig';
 import { parseApiError } from '../../utils/errorHandler';
-
-// API Configuration
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8081';
 
 interface RebookingSuggestion {
   flightId: number;
@@ -68,14 +65,10 @@ const DelayNotification: React.FC<DelayNotificationProps> = ({ token, bookings, 
         newDepartureTime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString() // 2 hours delay
       };
 
-      await axios.post(`${API_BASE_URL}/api/recommendations/notify-delay`, delayRequest, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await apiClient.post(`/api/recommendations/notify-delay`, delayRequest);
 
       // Fetch rebooking suggestions
-      const suggestionsResponse = await axios.get(`${API_BASE_URL}/api/recommendations/suggestions?bookingId=${selectedBookingId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const suggestionsResponse = await apiClient.get(`/api/recommendations/suggestions?bookingId=${selectedBookingId}`);
 
       setSuggestions(prev => ({
         ...prev,
@@ -110,10 +103,8 @@ const DelayNotification: React.FC<DelayNotificationProps> = ({ token, bookings, 
     setSuccess(null);
 
     try {
-      await axios.put(`${API_BASE_URL}/api/bookings/${bookingId}`, {
+      await apiClient.put(`/api/bookings/${bookingId}`, {
         flightId: newFlightId
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
       });
 
       setSuccess('Successfully rebooked to alternative flight!');

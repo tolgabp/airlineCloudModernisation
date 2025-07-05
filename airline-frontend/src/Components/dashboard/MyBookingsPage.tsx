@@ -4,10 +4,7 @@ import MyBookings from './MyBookings';
 import { useAuth } from '../../App';
 import { useDataRefresh } from '../../hooks/useDataRefresh';
 import { usePeriodicRefresh } from '../../hooks/usePeriodicRefresh';
-import axios from 'axios';
-
-// API Configuration
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8081';
+import apiClient from '../../utils/axiosConfig';
 
 const MyBookingsPage: React.FC = () => {
   const [bookings, setBookings] = useState<any[]>([]);
@@ -21,7 +18,7 @@ const MyBookingsPage: React.FC = () => {
   // Function to fetch flights
   const fetchFlights = useCallback(async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/flights`);
+      const response = await apiClient.get(`/api/flights`);
       const mappedFlights = response.data.map((f: any) => ({
         id: f.id,
         from: f.origin,
@@ -44,9 +41,7 @@ const MyBookingsPage: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get(`${API_BASE_URL}/api/bookings/my`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await apiClient.get(`/api/bookings/my`);
       setBookings(response.data);
     } catch (error) {
       console.error('Failed to fetch bookings:', error);

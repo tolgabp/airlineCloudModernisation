@@ -2,10 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../App';
 import { parseApiError, isAuthError } from '../../utils/errorHandler';
-import axios from 'axios';
-
-// API Configuration
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8081';
+import apiClient from '../../utils/axiosConfig';
 
 const MyProfilePage: React.FC = () => {
   const [userData, setUserData] = useState<any>(null);
@@ -38,9 +35,7 @@ const MyProfilePage: React.FC = () => {
 
   const fetchUserData = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/user/profile`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await apiClient.get(`/api/user/profile`);
       setUserData(response.data);
       setEditForm({
         name: response.data.name || '',
@@ -86,9 +81,7 @@ const MyProfilePage: React.FC = () => {
     setMessage('');
 
     try {
-      await axios.put(`${API_BASE_URL}/api/user/profile`, editForm, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await apiClient.put(`/api/user/profile`, editForm);
       setUserData({ ...userData, ...editForm });
       setIsEditing(false);
       setMessage('Profile updated successfully!');
