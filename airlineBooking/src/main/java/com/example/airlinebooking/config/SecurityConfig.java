@@ -38,6 +38,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/users/register", "/api/users/login", "/api/flights/**").permitAll()
                 .requestMatchers("/api/bookings/*/status").permitAll() // Allow status updates from recommendation engine
                 .requestMatchers("/api/bookings/*/status/system").permitAll() // Allow system status updates
+                .requestMatchers("/actuator/**").permitAll() // Allow actuator endpoints for health checks
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
