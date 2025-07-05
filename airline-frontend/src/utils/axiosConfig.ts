@@ -16,7 +16,6 @@ apiClient.interceptors.response.use(
   (error) => {
     // Handle authentication errors (401 Unauthorized)
     if (isAuthError(error)) {
-      console.log('Authentication error detected, clearing auth data');
       clearAuthData();
       
       // Redirect to login page if we're in a browser environment
@@ -34,26 +33,19 @@ apiClient.interceptors.request.use(
   (config) => {
     // Add auth token from localStorage if available
     const token = localStorage.getItem('airline_auth_data');
-    console.log('Request interceptor - localStorage token:', token);
+    
     if (token) {
       try {
         const authData = JSON.parse(token);
-        console.log('Request interceptor - parsed auth data:', authData);
         if (authData.token) {
           config.headers.Authorization = `Bearer ${authData.token}`;
-          console.log('Request interceptor - added Authorization header');
-        } else {
-          console.log('Request interceptor - no token in auth data');
         }
       } catch (error) {
         console.error('Error parsing auth data:', error);
         clearAuthData();
       }
-    } else {
-      console.log('Request interceptor - no token in localStorage');
     }
     
-    console.log('Request interceptor - final config headers:', config.headers);
     return config;
   },
   (error) => {

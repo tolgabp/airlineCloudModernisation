@@ -48,6 +48,7 @@ const ResponsiveDashboard: React.FC = () => {
   const fetchFlights = useCallback(async () => {
     try {
       const response = await apiClient.get(`/api/flights`);
+      console.log('Raw flight data from API:', response.data);
       const mappedFlights = response.data.map((f: any) => ({
         id: f.id,
         from: f.origin,
@@ -55,6 +56,8 @@ const ResponsiveDashboard: React.FC = () => {
         time: new Date(f.departureTime).toLocaleString(),
         availableSeats: f.availableSeats
       }));
+      console.log('Mapped flights:', mappedFlights);
+      console.log('Total flights fetched:', mappedFlights.length);
       setFlights(mappedFlights);
     } catch (error) {
       console.error('Failed to fetch flights:', error);
@@ -281,20 +284,20 @@ const ResponsiveDashboard: React.FC = () => {
       {/* Desktop Layout */}
       <div className="hidden md:block">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
             {/* Main Content Area */}
-            <div className="lg:col-span-2 space-y-8">
+            <div className="xl:col-span-2 space-y-8">
               {/* Flights Section */}
-              <div className="card p-8">
-                <div className="flex items-center mb-8">
-                  <div className="bg-airline-100 w-16 h-16 rounded-2xl flex items-center justify-center mr-6">
-                    <svg className="w-8 h-8 text-airline-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="card p-6 lg:p-8">
+                <div className="flex items-center mb-6 lg:mb-8">
+                  <div className="bg-airline-100 w-12 h-12 lg:w-16 lg:h-16 rounded-xl lg:rounded-2xl flex items-center justify-center mr-4 lg:mr-6">
+                    <svg className="w-6 h-6 lg:w-8 lg:h-8 text-airline-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-900">Available Flights</h2>
-                    <p className="text-gray-600">Search and book your next journey with ease</p>
+                    <h2 className="text-xl lg:text-2xl font-bold text-gray-900">Available Flights</h2>
+                    <p className="text-sm lg:text-base text-gray-600">Search and book your next journey with ease</p>
                   </div>
                 </div>
                 

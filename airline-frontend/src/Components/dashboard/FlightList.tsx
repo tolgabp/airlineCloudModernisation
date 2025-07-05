@@ -45,11 +45,26 @@ const FlightList: React.FC<FlightListProps> = ({ flights, onFlightSelect }) => {
         hasActiveFilters={hasActiveFilters}
       />
 
-      {/* Show welcome message when no search has been performed */}
-      {!hasActiveFilters && (
+      {/* Show welcome message when no flights available */}
+      {flights.length === 0 && !hasActiveFilters && (
         <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
           <div className="text-gray-500">
             <svg className="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No flights available</h3>
+            <p className="text-sm text-gray-500 mb-4">
+              There are currently no flights available. Please check back later.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Show search prompt when flights exist but no search has been performed */}
+      {flights.length > 0 && !hasActiveFilters && (
+        <div className="text-center py-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 mb-6">
+          <div className="text-gray-500">
+            <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <h3 className="text-lg font-medium text-gray-900 mb-2">Ready to find your flight?</h3>
@@ -74,10 +89,10 @@ const FlightList: React.FC<FlightListProps> = ({ flights, onFlightSelect }) => {
         </div>
       )}
 
-      {/* Enhanced Flight List - Only show when there are active filters */}
-      {hasActiveFilters && (
+      {/* Enhanced Flight List - Show all flights by default, or filtered results */}
+      {(flights.length > 0) && (
         <EnhancedFlightList 
-          flights={filteredFlights} 
+          flights={hasActiveFilters ? filteredFlights : flights} 
           onFlightSelect={onFlightSelect}
         />
       )}
