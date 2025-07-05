@@ -31,7 +31,7 @@ const EnhancedFlightList: React.FC<EnhancedFlightListProps> = ({
   return (
     <div className="space-y-4">
       {/* Desktop Table */}
-      <div className="hidden lg:block overflow-hidden shadow-soft ring-1 ring-gray-200 rounded-2xl">
+      <div className="hidden md:block overflow-hidden shadow-soft ring-1 ring-gray-200 rounded-2xl">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
@@ -116,7 +116,7 @@ const EnhancedFlightList: React.FC<EnhancedFlightListProps> = ({
       </div>
 
       {/* Mobile Cards */}
-      <div className="lg:hidden space-y-4">
+      <div className="md:hidden space-y-4">
         {flights.map((flight, index) => (
           <div 
             key={flight.id}
