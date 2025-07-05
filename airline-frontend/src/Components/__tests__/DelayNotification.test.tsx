@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import axios from 'axios';
-import DelayNotification from '../DelayNotification';
+import DelayNotification from '../notifications/DelayNotification';
 
 // Mock axios
 jest.mock('axios');

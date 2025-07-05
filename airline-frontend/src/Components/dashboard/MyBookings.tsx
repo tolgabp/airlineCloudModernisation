@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { parseApiError, isAuthError } from "../utils/errorHandler";
+import { parseApiError, isAuthError } from "../../utils/errorHandler";
 
 interface MyBookingsProps {
   bookings: any[];
@@ -22,8 +22,9 @@ const MyBookings: React.FC<MyBookingsProps> = ({ bookings, flights, token, onBoo
     }
 
     try {
+      const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8081';
       await axios.put(
-        `http://localhost:8081/api/bookings/${bookingId}`,
+        `${API_BASE_URL}/api/bookings/${bookingId}`,
         { flightId: selectedFlightId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -54,8 +55,9 @@ const MyBookings: React.FC<MyBookingsProps> = ({ bookings, flights, token, onBoo
     }
 
     try {
+      const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8081';
       await axios.post(
-        `http://localhost:8081/api/bookings/${bookingId}/cancel`,
+        `${API_BASE_URL}/api/bookings/${bookingId}/cancel`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -80,8 +82,9 @@ const MyBookings: React.FC<MyBookingsProps> = ({ bookings, flights, token, onBoo
 
   const handleViewRebookingSuggestions = async (bookingId: number) => {
     try {
+      const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8081';
       const response = await axios.get(
-        `http://localhost:8081/api/recommendations/suggestions?bookingId=${bookingId}`,
+        `${API_BASE_URL}/api/recommendations/suggestions?bookingId=${bookingId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
@@ -205,19 +208,6 @@ const MyBookings: React.FC<MyBookingsProps> = ({ bookings, flights, token, onBoo
                     </svg>
                     {editingBooking === booking.id ? 'Cancel Edit' : 'Change Flight'}
                   </button>
-                  
-                  {booking.status === 'DELAYED' && (
-                    <button
-                      onClick={() => handleViewRebookingSuggestions(booking.id)}
-                      className="bg-orange-600 text-white rounded-lg px-3 py-2 text-sm hover:bg-orange-700 transition-colors font-medium flex items-center"
-                    >
-                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                      </svg>
-                      View Alternatives
-                    </button>
-                  )}
-                  
                   <button
                     onClick={() => handleCancelBooking(booking.id)}
                     className="bg-red-600 text-white rounded-lg px-3 py-2 text-sm hover:bg-red-700 transition-colors font-medium flex items-center"
@@ -233,28 +223,70 @@ const MyBookings: React.FC<MyBookingsProps> = ({ bookings, flights, token, onBoo
               {editingBooking === booking.id && (
                 <div className="mt-4 p-4 bg-white rounded-lg border border-gray-200">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Select New Flight:
+                    Select Alternative Flight (Same Route, Future Departures Only):
                   </label>
-                  {flights.filter((flight) => flight.id !== booking.flight.id).length === 0 ? (
-                    <div className="text-gray-500 text-sm mb-2">
-                      No other flights available to change to.
-                    </div>
-                  ) : (
-                    <select
-                      value={selectedFlightId || ""}
-                      onChange={(e) => setSelectedFlightId(Number(e.target.value))}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                    >
-                      <option value="">Choose a flight...</option>
-                      {flights
-                        .filter((flight) => flight.id !== booking.flight.id)
-                        .map((flight) => (
+                  {(() => {
+                    // Get the current booking's origin and destination
+                    const currentFlight = flights.find(f => f.id === booking.flight.id);
+                    const currentOrigin = currentFlight?.from || booking.flight.origin || booking.flight.from;
+                    const currentDestination = currentFlight?.to || booking.flight.destination || booking.flight.to;
+                    
+                    // Get current time for filtering
+                    const now = new Date();
+                    
+                    // Filter flights to same origin and destination, but different flight ID and future departure time
+                    const alternativeFlights = flights.filter((flight) => {
+                      // Same route but different flight
+                      const sameRoute = flight.id !== booking.flight.id && 
+                                      flight.from === currentOrigin && 
+                                      flight.to === currentDestination;
+                      
+                      // Future departure time
+                      const futureDeparture = new Date(flight.departureTime) > now;
+                      
+                      return sameRoute && futureDeparture;
+                    });
+                    
+                    if (alternativeFlights.length === 0) {
+                      // Check if there are any flights with same route but past departure time
+                      const pastFlights = flights.filter((flight) => 
+                        flight.id !== booking.flight.id && 
+                        flight.from === currentOrigin && 
+                        flight.to === currentDestination &&
+                        new Date(flight.departureTime) <= now
+                      );
+                      
+                      if (pastFlights.length > 0) {
+                        return (
+                          <div className="text-gray-500 text-sm mb-2">
+                            No future alternative flights available for the same route ({currentOrigin} → {currentDestination}). 
+                            All other flights on this route have already departed.
+                          </div>
+                        );
+                      } else {
+                        return (
+                          <div className="text-gray-500 text-sm mb-2">
+                            No alternative flights available for the same route ({currentOrigin} → {currentDestination}).
+                          </div>
+                        );
+                      }
+                    }
+                    
+                    return (
+                      <select
+                        value={selectedFlightId || ""}
+                        onChange={(e) => setSelectedFlightId(Number(e.target.value))}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                      >
+                        <option value="">Choose a future alternative flight...</option>
+                        {alternativeFlights.map((flight) => (
                           <option key={flight.id} value={flight.id}>
                             {flight.from} → {flight.to} at {flight.time}
                           </option>
                         ))}
-                    </select>
-                  )}
+                      </select>
+                    );
+                  })()}
                   
                   {selectedFlightId && (
                     <div className="flex gap-2 mt-3">

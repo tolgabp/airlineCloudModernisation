@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { parseApiError } from '../utils/errorHandler';
+import { parseApiError } from '../../utils/errorHandler';
 
 // API Configuration
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8081';
@@ -200,19 +200,26 @@ const DelayNotification: React.FC<DelayNotificationProps> = ({ token, bookings, 
           </div>
         )}
 
-        {bookings.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="text-gray-500">
-              <svg className="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No bookings available</h3>
-              <p className="text-sm text-gray-500">
-                No bookings available to simulate delays for.
-              </p>
-            </div>
-          </div>
-        ) : (
+        {/* Filter bookings to only show CONFIRMED flights for simulation */}
+        {(() => {
+          const confirmedBookings = bookings.filter(booking => booking.status === 'CONFIRMED');
+          if (confirmedBookings.length === 0) {
+            return (
+              <div className="text-center py-12">
+                <div className="text-gray-500">
+                  <svg className="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No confirmed bookings available</h3>
+                  <p className="text-sm text-gray-500">
+                    Only confirmed flights can be used for delay simulation. You have {bookings.length} total booking(s), but none are confirmed.
+                  </p>
+                </div>
+              </div>
+            );
+          }
+          
+          return (
           <div className="space-y-4">
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <div className="flex items-start">
@@ -241,7 +248,7 @@ const DelayNotification: React.FC<DelayNotificationProps> = ({ token, bookings, 
                 disabled={simulating}
               >
                 <option value="">Choose a booking...</option>
-                {bookings.map((booking) => (
+                {confirmedBookings.map((booking) => (
                   <option key={booking.id} value={booking.id}>
                     Booking #{booking.id}: {getBookingDisplay(booking)}
                   </option>
@@ -264,7 +271,8 @@ const DelayNotification: React.FC<DelayNotificationProps> = ({ token, bookings, 
               )}
             </button>
           </div>
-        )}
+          );
+        })()}
       </div>
     );
   }

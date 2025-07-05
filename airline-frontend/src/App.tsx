@@ -1,39 +1,78 @@
 import './App.css';
-import Login from './Components/Login';
-import Register from './Components/Register';
-import ErrorBoundary from './Components/ErrorBoundary';
-import PublicHomePage from './Components/PublicHomePage';
-import Navigation from './Components/Navigation';
-import ResponsiveDashboard from './Components/ResponsiveDashboard';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import Login from './Components/auth/Login';
+import Register from './Components/auth/Register';
+import ErrorBoundary from './Components/common/ErrorBoundary';
+import PublicHomePage from './Components/common/PublicHomePage';
+import Navigation from './Components/common/Navigation';
+import ResponsiveDashboard from './Components/dashboard/ResponsiveDashboard';
+import MyProfilePage from './Components/profile/MyProfilePage';
+import BookingHistoryPage from './Components/dashboard/BookingHistoryPage';
+import MyBookingsPage from './Components/dashboard/MyBookingsPage';
 import { NotificationProvider } from './context/NotificationContext';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, createContext, useContext } from 'react';
 import axios from 'axios';
 import { parseApiError } from './utils/errorHandler';
 import { saveAuthData, loadAuthData, clearAuthData, AuthData } from './utils/authUtils';
-import { useDataRefresh } from './hooks/useDataRefresh';
-import { usePeriodicRefresh } from './hooks/usePeriodicRefresh';
 import { isTokenExpired, isTokenExpiringSoon } from './utils/tokenValidator';
 
 // API Configuration
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8081';
 
-function App() {
-  const [page, setPage] = useState<"home" | "login" | "register" | "dashboard">("home");
+// Auth Context
+interface AuthContextType {
+  email: string | null;
+  token: string | null;
+  isAuthenticated: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  register: (name: string, email: string, password: string) => Promise<void>;
+  logout: () => void;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
+
+// Protected Route Component
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+}
+
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+  const { isAuthenticated } = useAuth();
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
+// Public Route Component (redirects authenticated users)
+interface PublicRouteProps {
+  children: React.ReactNode;
+}
+
+const PublicRoute: React.FC<PublicRouteProps> = ({ children }) => {
+  const { isAuthenticated } = useAuth();
+  
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
+// Auth Provider Component
+const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [email, setEmail] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null);
-  const [flights, setFlights] = useState([]);
-  const [bookings, setBookings] = useState<any[]>([]);
-  const { registerRefreshCallback, triggerRefreshAfterDelay } = useDataRefresh();
-  
-  // Set up periodic refresh for real-time updates (only when authenticated)
-  usePeriodicRefresh({
-    intervalMs: 30000, // 30 seconds
-    enabled: page === "dashboard" && !!token,
-    onRefresh: () => {
-      fetchBookings();
-      fetchFlights();
-    }
-  });
 
   // Load authentication data on app startup
   useEffect(() => {
@@ -52,220 +91,160 @@ function App() {
         // In a real app, you might want to refresh the token here
       }
       
-              setEmail(authData.email);
-        setToken(authData.token);
-        setPage("dashboard");
+      setEmail(authData.email);
+      setToken(authData.token);
     }
   }, []);
 
-  // Function to fetch flights
-  const fetchFlights = useCallback(async () => {
+  const login = async (email: string, password: string) => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/flights`);
-      const mappedFlights = response.data.map((f: any) => ({
-        id: f.id,
-        from: f.origin,
-        to: f.destination,
-        time: new Date(f.departureTime).toLocaleString()
-      }));
-      setFlights(mappedFlights);
+      const response = await axios.post(`${API_BASE_URL}/api/login`, { email, password });
+      const authData: AuthData = {
+        token: response.data.token,
+        email: email,
+        userId: response.data.user?.id
+      };
+      
+      // Save to localStorage for persistence
+      saveAuthData(authData);
+      
+      setEmail(email);
+      setToken(response.data.token);
     } catch (error) {
-      console.error('Failed to fetch flights:', error);
-      // Silently handle flight fetching errors - flights will remain empty
+      const errorMessage = parseApiError(error);
+      throw new Error(`Login failed: ${errorMessage}`);
     }
-  }, []);
-
-  // Function to fetch bookings
-  const fetchBookings = useCallback(async () => {
-    if (!token) return;
-    
-    try {
-      const response = await axios.get(`${API_BASE_URL}/api/bookings/my`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setBookings(response.data);
-    } catch (error) {
-      console.error('Failed to fetch bookings:', error);
-      setBookings([]);
-    }
-  }, [token]);
-
-  // Register refresh callbacks
-  useEffect(() => {
-    const unregisterFlights = registerRefreshCallback(fetchFlights);
-    const unregisterBookings = registerRefreshCallback(fetchBookings);
-    
-    return () => {
-      unregisterFlights();
-      unregisterBookings();
-    };
-  }, [registerRefreshCallback, fetchFlights, fetchBookings]);
-
-  // Fetch data when authenticated
-  useEffect(() => {
-    if (page === "dashboard" && token) {
-      fetchFlights();
-      fetchBookings();
-    }
-  }, [page, token, fetchFlights, fetchBookings]);
-
-  const handleRegister = (name: string, email: string, password: string) => {
-    axios.post(`${API_BASE_URL}/api/register`, { name, email, password })
-      .then(response => {
-        alert('Registration successful! Please login.');
-        setPage("login");
-      })
-      .catch(error => {
-        const errorMessage = parseApiError(error);
-        alert(`Registration failed: ${errorMessage}`);
-      });
   };
 
-  const handleLogin = (email: string, password: string) => {
-    axios.post(`${API_BASE_URL}/api/login`, { email, password })
-      .then(response => {
-        const authData: AuthData = {
-          token: response.data.token,
-          email: email,
-          userId: response.data.user?.id
-        };
-        
-        // Save to localStorage for persistence
-        saveAuthData(authData);
-        
-        setEmail(email);
-        setToken(response.data.token);
-        setPage("dashboard");
-      })
-      .catch(error => {
-        const errorMessage = parseApiError(error);
-        alert(`Login failed: ${errorMessage}`);
-      });
+  const register = async (name: string, email: string, password: string) => {
+    try {
+      await axios.post(`${API_BASE_URL}/api/register`, { name, email, password });
+    } catch (error) {
+      const errorMessage = parseApiError(error);
+      throw new Error(`Registration failed: ${errorMessage}`);
+    }
   };
 
-  const handleLogout = () => {
+  const logout = () => {
     // Clear from localStorage
     clearAuthData();
     
     setEmail(null);
     setToken(null);
-    setPage("home");
-    setBookings([]);
   };
 
-  const handleHome = () => {
-    if (token) {
-      setPage("dashboard");
-    } else {
-      setPage("home");
-    }
+  const value: AuthContextType = {
+    email,
+    token,
+    isAuthenticated: !!token,
+    login,
+    register,
+    logout
   };
 
-  const refreshBookings = () => {
-    triggerRefreshAfterDelay(500); // Small delay to ensure backend updates are complete
-  };
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
 
-  // Render different pages based on current state
-  if (page === "login") {
-    return (
-      <ErrorBoundary>
-        <Login 
-          onLogin={handleLogin} 
-          onBackToHome={handleHome}
-          onGoToRegister={() => setPage("register")}
-        />
-      </ErrorBoundary>
-    );
-  }
-
-  if (page === "register") {
-    return (
-      <ErrorBoundary>
-        <Register 
-          onRegister={handleRegister} 
-          onBackToHome={handleHome}
-          onGoToLogin={() => setPage("login")}
-        />
-      </ErrorBoundary>
-    );
-  }
-
-  if (page === "dashboard") {
-    return (
-      <ErrorBoundary>
-        <NotificationProvider token={token}>
-          <div className="min-h-screen bg-gray-50">
-            {/* Navigation */}
-            <Navigation
-              isAuthenticated={!!token}
-              userEmail={email}
-              onLogin={() => setPage("login")}
-              onRegister={() => setPage("register")}
-              onLogout={handleLogout}
-              onHome={handleHome}
-            />
-
-            {/* Responsive Dashboard */}
-            <ResponsiveDashboard
-              flights={flights}
-              bookings={bookings}
-              token={token}
-              onBookingUpdate={refreshBookings}
-              onLogout={handleLogout}
-              onFlightSelect={(flight) => {
-                // This could be used to pre-select a flight in the booking form
-                console.log('Selected flight:', flight);
-              }}
-              onBook={flight => {
-                if (!token) {
-                  alert('You must be logged in to book a flight.');
-                  return;
-                }
-                axios.post(`${API_BASE_URL}/api/bookings`, {
-                  flightId: flight.id
-                }, {
-                  headers: { Authorization: `Bearer ${token}` }
-                })
-                .then(() => {
-                  alert('Flight booked successfully!');
-                  // Refresh bookings after successful booking
-                  triggerRefreshAfterDelay(500);
-                })
-                .catch(error => {
-                  const errorMessage = parseApiError(error);
-                  alert(`Booking failed: ${errorMessage}`);
-                });
-              }}
-              onRebookingSuccess={() => triggerRefreshAfterDelay(1000)}
-            />
-          </div>
-        </NotificationProvider>
-      </ErrorBoundary>
-    );
-  }
-
-  // Default: Public Home Page
+// Main App Component
+function App() {
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-gray-50">
-        {/* Navigation */}
-        <Navigation
-          isAuthenticated={!!token}
-          userEmail={email}
-          onLogin={() => setPage("login")}
-          onRegister={() => setPage("register")}
-          onLogout={handleLogout}
-          onHome={handleHome}
+      <AuthProvider>
+        <Router>
+          <AppRoutes />
+        </Router>
+      </AuthProvider>
+    </ErrorBoundary>
+  );
+}
+
+// App Routes Component
+const AppRoutes: React.FC = () => {
+  const { token } = useAuth();
+  const location = useLocation();
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      {/* Navigation - Show on all pages except auth pages */}
+      {!location.pathname.includes('/login') && !location.pathname.includes('/register') && (
+        <Navigation />
+      )}
+
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<PublicHomePage />} />
+        
+        <Route 
+          path="/login" 
+          element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          } 
+        />
+        
+        <Route 
+          path="/register" 
+          element={
+            <PublicRoute>
+              <Register />
+            </PublicRoute>
+          } 
         />
 
-        {/* Public Home Page */}
-        <PublicHomePage
-          flights={flights}
-          onLogin={() => setPage("login")}
-          onRegister={() => setPage("register")}
+        {/* Protected Routes */}
+        <Route 
+          path="/dashboard" 
+          element={
+            <ProtectedRoute>
+              <NotificationProvider token={token}>
+                <ResponsiveDashboard />
+              </NotificationProvider>
+            </ProtectedRoute>
+          } 
         />
-      </div>
-    </ErrorBoundary>
+        
+        <Route 
+          path="/profile" 
+          element={
+            <ProtectedRoute>
+              <NotificationProvider token={token}>
+                <MyProfilePage />
+              </NotificationProvider>
+            </ProtectedRoute>
+          } 
+        />
+        
+        <Route 
+          path="/booking-history" 
+          element={
+            <ProtectedRoute>
+              <NotificationProvider token={token}>
+                <BookingHistoryPage />
+              </NotificationProvider>
+            </ProtectedRoute>
+          } 
+        />
+        
+        <Route 
+          path="/my-bookings" 
+          element={
+            <ProtectedRoute>
+              <NotificationProvider token={token}>
+                <MyBookingsPage />
+              </NotificationProvider>
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* Catch all route - redirect to home */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </div>
   );
 }
 

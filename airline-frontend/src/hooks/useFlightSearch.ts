@@ -6,13 +6,14 @@ export interface Flight {
   from: string;
   to: string;
   time: string;
+  availableSeats?: number; // Optional since it might not be included in all flight data
 }
 
 export interface FlightFilters {
   search: string;
   origin: string;
   destination: string;
-  status: string;
+  status: string; // This now represents availability filter
 }
 
 export const useFlightSearch = (flights: Flight[]) => {
@@ -58,8 +59,10 @@ export const useFlightSearch = (flights: Flight[]) => {
       // Destination filter
       const matchesDestination = !filters.destination || flight.to === filters.destination;
 
-      // Status filter (for future use - currently all flights are active)
-      const matchesStatus = !filters.status || filters.status === 'all';
+      // Availability filter
+      const matchesStatus = !filters.status || 
+        (filters.status === 'available' && (flight.availableSeats ?? 0) > 0) ||
+        (filters.status === 'full' && (flight.availableSeats ?? 0) === 0);
 
       return matchesSearch && matchesOrigin && matchesDestination && matchesStatus;
     });

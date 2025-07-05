@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNotifications } from '../context/NotificationContext';
+import { useNotifications } from '../../context/NotificationContext';
 
 const NotificationBell: React.FC = () => {
   const { notifications, unreadCount, markAsRead, clearNotifications, isConnected } = useNotifications();

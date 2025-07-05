@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import FlightList from '../FlightList';
+import FlightList from '../dashboard/FlightList';
 import { Flight } from '../../hooks/useFlightSearch';
 
 // Mock the useFlightSearch hook

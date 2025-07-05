@@ -1,5 +1,5 @@
 import React from 'react';
-import { useFlightSearch, Flight } from '../hooks/useFlightSearch';
+import { useFlightSearch, Flight } from '../../hooks/useFlightSearch';
 import FlightSearchFilters from './FlightSearchFilters';
 import EnhancedFlightList from './EnhancedFlightList';
 
@@ -65,6 +65,9 @@ const FlightList: React.FC<FlightListProps> = ({ flights, onFlightSelect }) => {
               </span>
               <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
                 Filter by destination
+              </span>
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                Filter by availability
               </span>
             </div>
           </div>

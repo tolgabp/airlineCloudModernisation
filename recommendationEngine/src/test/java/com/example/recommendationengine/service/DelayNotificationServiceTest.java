@@ -53,7 +53,8 @@ class DelayNotificationServiceTest {
             rebookingSuggestionRepository, 
             restTemplate
         );
-        ReflectionTestUtils.setField(delayNotificationService, "legacyBaseUrl", "http://localhost:8080");
+        ReflectionTestUtils.setField(delayNotificationService, "cloudApiBaseUrl", "http://localhost:8081");
+        ReflectionTestUtils.setField(delayNotificationService, "airlineBookingBaseUrl", "http://localhost:8080");
 
         testNotification = new DelayNotification();
         testNotification.setId(1L);
