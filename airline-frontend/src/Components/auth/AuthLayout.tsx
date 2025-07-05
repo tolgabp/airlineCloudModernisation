@@ -46,13 +46,6 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ title, children, onBackToHome }
             </div>
           )}
         </div>
-        
-        {/* Footer */}
-        <div className="text-center mt-8">
-          <p className="text-sm text-gray-500">
-            © 2024 SkyBook. All rights reserved.
-          </p>
-        </div>
       </div>
     </div>
   );

@@ -50,11 +50,9 @@ const EnhancedFlightList: React.FC<EnhancedFlightListProps> = ({
               <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                 Status
               </th>
-              {onFlightSelect && (
-                <th scope="col" className="relative px-6 py-4">
-                  <span className="sr-only">Actions</span>
-                </th>
-              )}
+              <th scope="col" className="relative px-6 py-4">
+                <span className="sr-only">Actions</span>
+              </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-100">
@@ -99,19 +97,19 @@ const EnhancedFlightList: React.FC<EnhancedFlightListProps> = ({
                     On Time
                   </span>
                 </td>
-                {onFlightSelect && (
-                  <td className="px-6 py-5 whitespace-nowrap text-right text-sm font-medium">
-                    <button
-                      onClick={() => onFlightSelect && onFlightSelect(flight)}
-                      className="btn-primary px-6 py-2 text-sm font-medium"
-                    >
-                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                      </svg>
-                      Book Now
-                    </button>
-                  </td>
-                )}
+                <td className="px-6 py-5 whitespace-nowrap text-right text-sm font-medium">
+                  <button
+                    onClick={() => onFlightSelect && onFlightSelect(flight)}
+                    className="btn-primary px-6 py-2 text-sm font-medium"
+                    disabled={!onFlightSelect}
+                    style={!onFlightSelect ? { opacity: 0.5, pointerEvents: 'none' } : {}}
+                  >
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Book Now
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
