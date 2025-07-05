@@ -99,12 +99,14 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   const login = async (email: string, password: string) => {
     try {
       const response = await axios.post(`${API_BASE_URL}/api/login`, { email, password });
+      console.log('Login response:', response.data);
       const authData: AuthData = {
         token: response.data.token,
         email: email,
         userId: response.data.user?.id
       };
       
+      console.log('Saving auth data:', authData);
       // Save to localStorage for persistence
       saveAuthData(authData);
       
