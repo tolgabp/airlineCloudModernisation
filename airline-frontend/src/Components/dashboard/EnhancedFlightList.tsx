@@ -102,7 +102,7 @@ const EnhancedFlightList: React.FC<EnhancedFlightListProps> = ({
                 {onFlightSelect && (
                   <td className="px-6 py-5 whitespace-nowrap text-right text-sm font-medium">
                     <button
-                      onClick={() => onFlightSelect(flight)}
+                      onClick={() => onFlightSelect && onFlightSelect(flight)}
                       className="btn-primary px-6 py-2 text-sm font-medium"
                     >
                       <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -162,17 +162,15 @@ const EnhancedFlightList: React.FC<EnhancedFlightListProps> = ({
                 <div className="text-sm text-gray-900 font-medium">Departure</div>
                 <div className="text-sm text-gray-500">{flight.time}</div>
               </div>
-              {onFlightSelect && (
-                <button
-                  onClick={() => onFlightSelect(flight)}
-                  className="btn-primary px-6 py-3 text-sm font-medium"
-                >
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                  Book Now
-                </button>
-              )}
+              <button
+                onClick={() => onFlightSelect && onFlightSelect(flight)}
+                className="btn-primary px-6 py-3 text-sm font-medium"
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                Book Now
+              </button>
             </div>
           </div>
         ))}
@@ -222,17 +220,15 @@ const EnhancedFlightList: React.FC<EnhancedFlightListProps> = ({
                 <div className="text-sm text-gray-900 font-medium">Departure</div>
                 <div className="text-sm text-gray-500">{flight.time}</div>
               </div>
-              {onFlightSelect && (
-                <button
-                  onClick={() => onFlightSelect(flight)}
-                  className="w-full btn-primary py-3 text-sm font-medium"
-                >
-                  <svg className="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                  Book Now
-                </button>
-              )}
+              <button
+                onClick={() => onFlightSelect && onFlightSelect(flight)}
+                className="w-full btn-primary py-3 text-sm font-medium"
+              >
+                <svg className="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                Book Now
+              </button>
             </div>
           </div>
         ))}
