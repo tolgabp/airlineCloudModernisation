@@ -13,14 +13,13 @@ public class CorsConfig {
 		return new WebMvcConfigurer() {
 			@Override
 			public void addCorsMappings(@NonNull CorsRegistry registry){
-				registry.addMapping("/api/**")
-					.allowedOrigins(
-						"http://localhost:3000", // local development
-						"https://airline-frontend-app-876da0517315.herokuapp.com" // Heroku frontend
-					)
-					.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+				registry.addMapping("/**")
+					.allowedOriginPatterns("*") // Allow all origins for now
+					.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH")
 					.allowedHeaders("*")
-					.allowCredentials(true);
+					.exposedHeaders("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With")
+					.allowCredentials(true)
+					.maxAge(3600);
 			}
 		};
 	}
