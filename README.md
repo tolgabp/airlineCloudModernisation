@@ -1,5 +1,7 @@
 # Airline Modernization System
 
+**Live Demo:** [https://airline-frontend-eu-532637077845.herokuapp.com/](https://airline-frontend-eu-532637077845.herokuapp.com/)
+
 ## Project Story
 While studying IBM’s Introduction to Cloud Computing, I was inspired by a real-world example of how airlines modernize their systems. 
 Most still run reservation systems on-prem, but use the cloud to build web apps and backend services that improve user experience—especially for things like flight delays and rebooking.
@@ -8,6 +10,7 @@ This project simulates that idea:
 A frontend connects to a cloud backend, which integrates with a simulated reservation system. When a delay happens, a recommendation engine suggests alternative flights, helping users rebook instantly.
 
 It’s my way of applying cloud concepts to solve a real problem.
+
 
 
 
