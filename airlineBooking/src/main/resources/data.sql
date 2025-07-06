@@ -1,12 +1,15 @@
 -- Mock flights data for airline booking system
 -- This provides a variety of routes for testing recommendations
 
--- Clear existing flights (if any)
+-- Clear existing data (including users to avoid orphaned references)
 DELETE FROM bookings;
 DELETE FROM flights;
+DELETE FROM users;
 
--- Reset flight ID sequence
+-- Reset sequences
 ALTER SEQUENCE flights_id_seq RESTART WITH 1;
+ALTER SEQUENCE users_id_seq RESTART WITH 1;
+ALTER SEQUENCE bookings_id_seq RESTART WITH 1;
 
 -- Insert comprehensive mock flights data
 INSERT INTO flights (origin, destination, departure_time, arrival_time, capacity, available_seats) VALUES
@@ -104,4 +107,4 @@ INSERT INTO flights (origin, destination, departure_time, arrival_time, capacity
 ('DUB', 'AMS', '2025-07-07 10:00:00', '2025-07-07 13:00:00', 140, 140),
 ('DUB', 'FRA', '2025-07-07 11:00:00', '2025-07-07 14:30:00', 150, 150),
 ('DUB', 'MAD', '2025-07-07 12:00:00', '2025-07-07 15:30:00', 120, 120),
-('DUB', 'BCN', '2025-07-07 13:00:00', '2025-07-07 16:30:00', 130, 130); 
+('DUB', 'BCN', '2025-07-07 13:00:00', '2025-07-07 16:30:00', 130, 130);
