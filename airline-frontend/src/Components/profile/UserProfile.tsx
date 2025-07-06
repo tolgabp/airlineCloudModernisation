@@ -30,7 +30,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ token, onLogout, email: userE
     }
 
     try {
-      const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8081';
+      const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'https://cloud-api-layer-eu-906b86b9ff06.herokuapp.com';
       await axios.put(
         `${API_BASE_URL}/api/users/profile`,
         { email, password },
@@ -60,7 +60,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ token, onLogout, email: userE
 
     setIsDeleting(true);
     try {
-      const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8081';
+      const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'https://cloud-api-layer-eu-906b86b9ff06.herokuapp.com';
       await axios.delete(
         `${API_BASE_URL}/api/users/profile`,
         { headers: { Authorization: `Bearer ${token}` } }

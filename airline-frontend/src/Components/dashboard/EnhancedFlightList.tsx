@@ -10,8 +10,11 @@ const EnhancedFlightList: React.FC<EnhancedFlightListProps> = ({
   flights, 
   onFlightSelect 
 }) => {
-  console.log('EnhancedFlightList received flights:', flights);
-  console.log('Number of flights to display:', flights.length);
+  const handleFlightClick = (flight: any) => {
+    if (onFlightSelect) {
+      onFlightSelect(flight);
+    }
+  };
 
   if (flights.length === 0) {
     return (
@@ -34,8 +37,8 @@ const EnhancedFlightList: React.FC<EnhancedFlightListProps> = ({
   return (
     <div className="space-y-4">
       {/* Desktop Table - Show on medium screens and up */}
-      <div className="hidden md:block overflow-hidden shadow-soft ring-1 ring-gray-200 rounded-2xl">
-        <table className="min-w-full divide-y divide-gray-200">
+      <div className="hidden md:block max-w-full overflow-x-auto max-h-[70vh] overflow-y-auto shadow ring-1 ring-gray-200 rounded-2xl">
+      <table className="min-w-full table-auto divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
               <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
@@ -99,7 +102,7 @@ const EnhancedFlightList: React.FC<EnhancedFlightListProps> = ({
                 </td>
                 <td className="px-6 py-5 whitespace-nowrap text-right text-sm font-medium">
                   <button
-                    onClick={() => onFlightSelect && onFlightSelect(flight)}
+                    onClick={() => handleFlightClick(flight)}
                     className="btn-primary px-6 py-2 text-sm font-medium"
                     disabled={!onFlightSelect}
                     style={!onFlightSelect ? { opacity: 0.5, pointerEvents: 'none' } : {}}
@@ -161,7 +164,7 @@ const EnhancedFlightList: React.FC<EnhancedFlightListProps> = ({
                 <div className="text-sm text-gray-500">{flight.time}</div>
               </div>
               <button
-                onClick={() => onFlightSelect && onFlightSelect(flight)}
+                onClick={() => handleFlightClick(flight)}
                 className="w-full btn-primary py-3 text-sm font-medium"
               >
                 <svg className="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">

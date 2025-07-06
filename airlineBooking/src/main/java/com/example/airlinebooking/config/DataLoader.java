@@ -2,6 +2,8 @@ package com.example.airlinebooking.config;
 
 import com.example.airlinebooking.model.Flight;
 import com.example.airlinebooking.repository.FlightRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +12,8 @@ import java.time.LocalDateTime;
 
 @Configuration
 public class DataLoader {
+
+    private static final Logger logger = LoggerFactory.getLogger(DataLoader.class);
 
     @Bean
     CommandLineRunner initDatabase(FlightRepository flightRepository) {
@@ -43,7 +47,7 @@ public class DataLoader {
                 flight3.setAvailableSeats(200);
                 flightRepository.save(flight3);
 
-                System.out.println("Test flights loaded successfully!");
+                logger.info("Test flights loaded successfully!");
             }
         };
     }

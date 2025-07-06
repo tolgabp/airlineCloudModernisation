@@ -5,6 +5,7 @@ import { useAuth } from '../../App';
 import { useDataRefresh } from '../../hooks/useDataRefresh';
 import { usePeriodicRefresh } from '../../hooks/usePeriodicRefresh';
 import apiClient from '../../utils/axiosConfig';
+import DelayNotification from '../notifications/DelayNotification';
 
 const MyBookingsPage: React.FC = () => {
   const [bookings, setBookings] = useState<any[]>([]);
@@ -14,6 +15,10 @@ const MyBookingsPage: React.FC = () => {
   const { token, logout } = useAuth();
   const navigate = useNavigate();
   const { registerRefreshCallback, triggerRefreshAfterDelay } = useDataRefresh();
+  
+  const handleRebookingSuccess = () => {
+    triggerRefreshAfterDelay(1000);
+  };
 
   // Function to fetch flights
   const fetchFlights = useCallback(async () => {
@@ -160,6 +165,12 @@ const MyBookingsPage: React.FC = () => {
             </div>
           )}
         </div>
+
+        <DelayNotification 
+                  token={token}
+                  bookings={bookings}
+                  onRebookingSuccess={handleRebookingSuccess}
+                />
 
         <MyBookings 
           bookings={activeBookings} 

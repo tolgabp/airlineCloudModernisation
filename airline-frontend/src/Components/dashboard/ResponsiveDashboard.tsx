@@ -2,15 +2,12 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import EnhancedFlightList from './EnhancedFlightList';
 import FlightSearchFilters from './FlightSearchFilters';
-import DelayNotification from '../notifications/DelayNotification';
 import UserProfile from '../profile/UserProfile';
 import { useAuth } from '../../App';
 import { useDataRefresh } from '../../hooks/useDataRefresh';
 import { usePeriodicRefresh } from '../../hooks/usePeriodicRefresh';
 import { useFlightSearch } from '../../hooks/useFlightSearch';
 import apiClient from '../../utils/axiosConfig';
-
-
 
 const ResponsiveDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'flights' | 'delays' | 'profile'>('flights');
@@ -21,7 +18,8 @@ const ResponsiveDashboard: React.FC = () => {
   const [bookingMessage, setBookingMessage] = useState('');
   const { token, logout } = useAuth();
   const navigate = useNavigate();
-  const { registerRefreshCallback, triggerRefreshAfterDelay } = useDataRefresh();
+  const { registerRefreshCallback } = useDataRefresh();
+
   
   // Flight search functionality
   const {
@@ -48,7 +46,6 @@ const ResponsiveDashboard: React.FC = () => {
   const fetchFlights = useCallback(async () => {
     try {
       const response = await apiClient.get(`/api/flights`);
-      console.log('Raw flight data from API:', response.data);
       const mappedFlights = response.data.map((f: any) => ({
         id: f.id,
         from: f.origin,
@@ -56,8 +53,6 @@ const ResponsiveDashboard: React.FC = () => {
         time: new Date(f.departureTime).toLocaleString(),
         availableSeats: f.availableSeats
       }));
-      console.log('Mapped flights:', mappedFlights);
-      console.log('Total flights fetched:', mappedFlights.length);
       setFlights(mappedFlights);
     } catch (error) {
       console.error('Failed to fetch flights:', error);
@@ -102,9 +97,7 @@ const ResponsiveDashboard: React.FC = () => {
     navigate('/');
   };
 
-  const handleRebookingSuccess = () => {
-    triggerRefreshAfterDelay(1000);
-  };
+  
 
   const handleFlightSelect = (flight: any) => {
     setSelectedFlight(flight);
@@ -248,12 +241,6 @@ const ResponsiveDashboard: React.FC = () => {
                   <p className="text-sm text-gray-600">Manage delays and rebooking options</p>
                 </div>
               </div>
-              
-              <DelayNotification 
-                token={token}
-                bookings={bookings}
-                onRebookingSuccess={handleRebookingSuccess}
-              />
             </div>
           )}
           
@@ -314,30 +301,6 @@ const ResponsiveDashboard: React.FC = () => {
                 <EnhancedFlightList 
                   flights={filteredFlights} 
                   onFlightSelect={handleFlightSelect}
-                />
-              </div>
-            </div>
-
-            {/* Sidebar */}
-            <div className="space-y-8">
-              {/* Delay Notifications */}
-              <div className="card p-6">
-                <div className="flex items-center mb-6">
-                  <div className="bg-warning-100 w-12 h-12 rounded-xl flex items-center justify-center mr-4">
-                    <svg className="w-6 h-6 text-warning-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-gray-900">Delay Notifications</h3>
-                    <p className="text-sm text-gray-600">Stay updated</p>
-                  </div>
-                </div>
-                
-                <DelayNotification 
-                  token={token}
-                  bookings={bookings}
-                  onRebookingSuccess={handleRebookingSuccess}
                 />
               </div>
             </div>

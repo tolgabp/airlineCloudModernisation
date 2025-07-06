@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../App';
 import { parseApiError, isAuthError } from '../../utils/errorHandler';
@@ -27,13 +27,7 @@ const MyProfilePage: React.FC = () => {
     }
   }, [message]);
 
-  useEffect(() => {
-    if (token) {
-      fetchUserData();
-    }
-  }, [token]);
-
-  const fetchUserData = async () => {
+  const fetchUserData = useCallback(async () => {
     try {
       const response = await apiClient.get(`/api/user/profile`);
       setUserData(response.data);
@@ -56,7 +50,13 @@ const MyProfilePage: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [logout, navigate]);
+
+  useEffect(() => {
+    if (token) {
+      fetchUserData();
+    }
+  }, [token, fetchUserData]);
 
   const handleUpdateProfile = async () => {
     // Basic validation

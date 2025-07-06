@@ -14,7 +14,10 @@ public class CorsConfig {
 			@Override
 			public void addCorsMappings(@NonNull CorsRegistry registry){
 				registry.addMapping("/**")
-					.allowedOriginPatterns("*") // Allow all origins for now
+					.allowedOrigins(
+						"https://airline-frontend-app-876da0517315.herokuapp.com",
+						"https://airline-frontend-app-554a763b7738.herokuapp.com"
+					)
 					.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH")
 					.allowedHeaders("*")
 					.exposedHeaders("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With")

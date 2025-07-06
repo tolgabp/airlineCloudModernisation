@@ -11,7 +11,10 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/recommendations")
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:8081"})
+@CrossOrigin(origins = {
+    "https://airline-frontend-app-876da0517315.herokuapp.com",
+    "https://airline-frontend-app-554a763b7738.herokuapp.com"
+})
 public class RecommendationController {
     
     private final DelayNotificationService delayNotificationService;

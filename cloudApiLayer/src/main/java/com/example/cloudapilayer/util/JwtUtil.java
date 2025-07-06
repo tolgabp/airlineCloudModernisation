@@ -14,10 +14,13 @@ import java.security.Key;
 @Component
 public class JwtUtil {
     
-    @Value("${jwt.secret:dev_secret_key_12345_very_long_for_development_only_change_in_production}")
+    @Value("${jwt.secret}")
     private String secretKey;
 
     private Key getSigningKey() {
+        if (secretKey == null || secretKey.trim().isEmpty()) {
+            throw new IllegalStateException("JWT_SECRET environment variable must be set");
+        }
         return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
     }
 

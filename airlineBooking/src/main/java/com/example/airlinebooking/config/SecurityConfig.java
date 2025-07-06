@@ -50,9 +50,8 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(
-            "http://localhost:8081", // local development
-            "http://localhost:3000", // local development
-            "https://airline-frontend-app-876da0517315.herokuapp.com" // Heroku frontend
+            "https://airline-frontend-app-876da0517315.herokuapp.com", // Heroku frontend
+            "https://airline-frontend-app-554a763b7738.herokuapp.com"  // Alternative Heroku frontend
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList(

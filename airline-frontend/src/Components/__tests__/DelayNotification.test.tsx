@@ -76,7 +76,7 @@ describe('DelayNotification Component', () => {
 
     await waitFor(() => {
       expect(mockedAxios.post).toHaveBeenCalledWith(
-        'http://localhost:8081/api/recommendations/notify-delay',
+        'https://cloud-api-layer-eu-906b86b9ff06.herokuapp.com/api/recommendations/notify-delay',
         expect.objectContaining({
           bookingId: 1,
           flightId: 1,
@@ -90,7 +90,7 @@ describe('DelayNotification Component', () => {
 
     await waitFor(() => {
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        'http://localhost:8081/api/recommendations/suggestions?bookingId=1',
+        'https://cloud-api-layer-eu-906b86b9ff06.herokuapp.com/api/recommendations/suggestions?bookingId=1',
         expect.objectContaining({
           headers: { Authorization: `Bearer ${mockToken}` }
         })
@@ -227,7 +227,7 @@ describe('DelayNotification Component', () => {
 
     await waitFor(() => {
       expect(mockedAxios.put).toHaveBeenCalledWith(
-        'http://localhost:8081/api/bookings/1',
+        'https://cloud-api-layer-eu-906b86b9ff06.herokuapp.com/api/bookings/1',
         { flightId: 2 },
         expect.objectContaining({
           headers: { Authorization: `Bearer ${mockToken}` }

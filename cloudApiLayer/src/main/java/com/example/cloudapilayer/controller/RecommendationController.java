@@ -15,7 +15,7 @@ public class RecommendationController {
 
     private final RestTemplate restTemplate;
 
-    @Value("${recommendation.engine.base-url:http://localhost:8082}")
+    @Value("${recommendation.engine.base-url:https://recommendation-engine-app-554a763b7738.herokuapp.com}")
     private String recommendationEngineBaseUrl;
 
     @Autowired

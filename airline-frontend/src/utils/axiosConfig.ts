@@ -4,7 +4,7 @@ import { clearAuthData } from './authUtils';
 
 // Create axios instance with base configuration
 const apiClient = axios.create({
-  baseURL: process.env.REACT_APP_API_BASE_URL || 'http://localhost:8081',
+  baseURL: process.env.REACT_APP_API_BASE_URL || 'https://cloud-api-layer-eu-906b86b9ff06.herokuapp.com',
   timeout: 10000,
 });
 

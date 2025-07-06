@@ -1,23 +1,28 @@
-import './App.css';
+import React, { useState, useEffect, createContext, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
+import './App.css';
+
+// Components
 import Login from './Components/auth/Login';
 import Register from './Components/auth/Register';
-import ErrorBoundary from './Components/common/ErrorBoundary';
+import ResponsiveDashboard from './Components/dashboard/ResponsiveDashboard';
 import PublicHomePage from './Components/common/PublicHomePage';
 import Navigation from './Components/common/Navigation';
-import ResponsiveDashboard from './Components/dashboard/ResponsiveDashboard';
 import MyProfilePage from './Components/profile/MyProfilePage';
-import BookingHistoryPage from './Components/dashboard/BookingHistoryPage';
 import MyBookingsPage from './Components/dashboard/MyBookingsPage';
+import BookingHistoryPage from './Components/dashboard/BookingHistoryPage';
+import ErrorBoundary from './Components/common/ErrorBoundary';
+
+// Context
 import { NotificationProvider } from './context/NotificationContext';
-import React, { useState, useEffect, createContext, useContext } from 'react';
-import axios from 'axios';
+
+// Utils
 import { parseApiError } from './utils/errorHandler';
-import { saveAuthData, loadAuthData, clearAuthData, AuthData } from './utils/authUtils';
-import { isTokenExpired, isTokenExpiringSoon } from './utils/tokenValidator';
+import { clearAuthData } from './utils/authUtils';
 
 // API Configuration
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8081';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'https://cloud-api-layer-eu-906b86b9ff06.herokuapp.com';
 
 // Auth Context
 interface AuthContextType {
@@ -74,47 +79,50 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   const [email, setEmail] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null);
 
-  // Load authentication data on app startup
+  // Check token expiration on app start
   useEffect(() => {
-    const authData = loadAuthData();
-    if (authData) {
-      // Check if token is expired
-      if (isTokenExpired(authData.token)) {
-        console.log('Stored token is expired, clearing auth data');
-        clearAuthData();
-        return;
+    const checkTokenExpiration = () => {
+      const authData = localStorage.getItem('airline_auth_data');
+      if (authData) {
+        try {
+          const parsed = JSON.parse(authData);
+          if (parsed.expiresAt && new Date(parsed.expiresAt) <= new Date()) {
+            // Token is expired, clear auth data
+            localStorage.removeItem('airline_auth_data');
+            setToken(null);
+            setEmail(null);
+          } else if (parsed.expiresAt && new Date(parsed.expiresAt) <= new Date(Date.now() + 5 * 60 * 1000)) {
+            // Token expires in next 5 minutes, consider refreshing
+            // For now, just log this - could implement token refresh here
+          }
+        } catch (error) {
+          localStorage.removeItem('airline_auth_data');
+          setToken(null);
+          setEmail(null);
+        }
       }
-      
-      // Check if token is expiring soon
-      if (isTokenExpiringSoon(authData.token)) {
-        console.log('Token is expiring soon, consider refreshing');
-        // In a real app, you might want to refresh the token here
-      }
-      
-      setEmail(authData.email);
-      setToken(authData.token);
-    }
+    };
+
+    checkTokenExpiration();
+    const interval = setInterval(checkTokenExpiration, 60000); // Check every minute
+    return () => clearInterval(interval);
   }, []);
 
   const login = async (email: string, password: string) => {
     try {
       const response = await axios.post(`${API_BASE_URL}/api/login`, { email, password });
-      console.log('Login response:', response.data);
-      const authData: AuthData = {
+      
+      const authData = {
         token: response.data.token,
-        email: email,
-        userId: response.data.user?.id
+        email: response.data.email,
+        expiresAt: response.data.expiresAt || new Date(Date.now() + 10 * 60 * 60 * 1000).toISOString() // 10 hours default
       };
       
-      console.log('Saving auth data:', authData);
-      // Save to localStorage for persistence
-      saveAuthData(authData);
-      
-      setEmail(email);
-      setToken(response.data.token);
-    } catch (error) {
-      const errorMessage = parseApiError(error);
-      throw new Error(`Login failed: ${errorMessage}`);
+      localStorage.setItem('airline_auth_data', JSON.stringify(authData));
+      setToken(authData.token);
+      setEmail(authData.email);
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Login failed');
     }
   };
 
